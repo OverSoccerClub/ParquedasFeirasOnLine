@@ -25,7 +25,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY backend/ .
 
 # Gera o Prisma Client (binaryTarget: linux-musl-openssl-3.0.x)
-RUN npx prisma generate
+RUN node_modules/.bin/prisma generate
 
 # Compila TypeScript
 RUN npm run build
@@ -68,4 +68,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD wget -qO- http://localhost:3000/health || exit 1
 
 # Executa migrações e sobe o servidor
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/server.js"]
