@@ -13,6 +13,9 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { cn } from "@/lib/utils"
+import { useCartStore } from "@/store/cartStore"
+import { CartDrawer } from "@/components/ui/CartDrawer"
+import { useAuthStore } from "@/store/authStore"
 
 const categories = [
   { label: "Masculino", href: "/produtos?categoria=masculino" },
@@ -29,6 +32,8 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
+  const { totalItems, toggleCart } = useCartStore()
+  const { user, isAuthenticated, logout } = useAuthStore()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,14 +113,14 @@ export function Header() {
             </Link>
 
             {/* Carrinho */}
-            <Link to="/carrinho">
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="relative" onClick={toggleCart}>
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  3
+                  {totalItems}
                 </span>
-              </Button>
-            </Link>
+              )}
+            </Button>
 
             {/* User */}
             <div className="relative group hidden sm:block">
@@ -124,28 +129,62 @@ export function Header() {
               </Button>
               <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <div className="bg-surface rounded-xl shadow-lg border border-border w-52 py-2">
-                  <Link
-                    to="/login"
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors"
-                  >
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    Entrar / Cadastrar
-                  </Link>
-                  <div className="border-t border-border my-1" />
-                  <Link
-                    to="/minha-conta/pedidos"
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors"
-                  >
-                    <Package className="h-4 w-4 text-muted-foreground" />
-                    Meus Pedidos
-                  </Link>
-                  <Link
-                    to="/painel-lojista"
-                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors"
-                  >
-                    <Store className="h-4 w-4 text-muted-foreground" />
-                    Painel do Lojista
-                  </Link>
+                  {isAuthenticated && user ? (
+                    <>
+                      <div className="px-4 py-2.5 border-b border-border">
+                        <p className="text-sm font-semibold text-primary truncate">{user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/minha-conta/pedidos"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors"
+                      >
+                        <Package className="h-4 w-4 text-muted-foreground" />
+                        Meus Pedidos
+                      </Link>
+                      {user.role === 'seller' && (
+                        <Link
+                          to="/painel-lojista"
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors"
+                        >
+                          <Store className="h-4 w-4 text-muted-foreground" />
+                          Painel do Lojista
+                        </Link>
+                      )}
+                      <div className="border-t border-border my-1" />
+                      <button
+                        onClick={logout}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors text-red-500"
+                      >
+                        Sair
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/login"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors"
+                      >
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        Entrar / Cadastrar
+                      </Link>
+                      <div className="border-t border-border my-1" />
+                      <Link
+                        to="/minha-conta/pedidos"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors"
+                      >
+                        <Package className="h-4 w-4 text-muted-foreground" />
+                        Meus Pedidos
+                      </Link>
+                      <Link
+                        to="/painel-lojista"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted text-sm transition-colors"
+                      >
+                        <Store className="h-4 w-4 text-muted-foreground" />
+                        Painel do Lojista
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -241,6 +280,7 @@ export function Header() {
           </div>
         </div>
       )}
+      <CartDrawer />
     </header>
   )
 }
