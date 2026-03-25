@@ -1,0 +1,48 @@
+# ============================================================
+# .dockerignore — Parque das Feiras
+# ============================================================
+
+# Node modules (reinstalado no container)
+**/node_modules
+**/.npm
+
+# Builds locais
+frontend/dist
+backend/dist
+
+# Variáveis de ambiente locais
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE e OS
+.vscode
+.idea
+*.DS_Store
+Thumbs.db
+
+# Testes
+**/__tests__
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/coverage
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+
+# Docs
+*.md
+docs/
